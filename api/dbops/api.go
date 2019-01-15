@@ -34,4 +34,12 @@ func GetUserCredential(loginName string) (string, error) {
 
 func DeleteUser(loginName string, pwd string) error {
 	stmtDel, err := dbConn.Prepare("delete from users where login_name = ?")
+	if err != nil {
+		log.Printf("DeleteUser error: %s", err)
+		return err
+	}
+
+	stmtDel.Exec(loginName, pwd)
+	stmtDel.Close()
+	return nil
 }
