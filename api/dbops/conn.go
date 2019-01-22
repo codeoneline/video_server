@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	dbConn *sql.dbops
+	dbConn *sql.DB
 	err error
 )
 

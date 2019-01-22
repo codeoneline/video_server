@@ -2,7 +2,8 @@ package dbops
 
 import (
 	"database/sql"
-	_ "github.com/go-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
+	"log"
 )
 
 // func openConn() *sql.DB {
@@ -14,8 +15,11 @@ func AddUserCredential(loginName string, pwd string) error {
 	if err != nil {
 		return err
 	}
-	stmtIns.Exec(loginName, pwd)
-	stmtIns.Close()
+	_, err = stmtIns.Exec(loginName, pwd)
+	if err != nil {
+		return err
+	}
+	defer stmtIns.Close()
 	return nil
 }
 
@@ -27,19 +31,29 @@ func GetUserCredential(loginName string) (string, error) {
 	}
 
 	var pwd string
-	stmtOut.QueryRow(loginName).Scan(&pwd)
-	stmtOut.Close()
+	err = stmtOut.QueryRow(loginName).Scan(&pwd)
+	if err != nil && err != sql.ErrNoRows {
+		return "", err
+	}
+	defer stmtOut.Close()
 	return pwd, nil
 }
 
 func DeleteUser(loginName string, pwd string) error {
-	stmtDel, err := dbConn.Prepare("delete from users where login_name = ?")
+	stmtDel, err := dbConn.Prepare("delete from users where login_name = ? and pwd = ?")
 	if err != nil {
 		log.Printf("DeleteUser error: %s", err)
 		return err
 	}
 
-	stmtDel.Exec(loginName, pwd)
-	stmtDel.Close()
+	_, err = stmtDel.Exec(loginName, pwd)
+	if err != nil {
+		return err
+	}
+	defer stmtDel.Close()
 	return nil
 }
+
+//func AddNewVideo(aid int, name string) {
+//
+//}
