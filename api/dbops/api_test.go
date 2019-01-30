@@ -1,8 +1,10 @@
 package dbops
 
 import (
+	"fmt"
+	"strconv"
 	"testing"
-
+	"time"
 )
 
 // init(dblogin, truncate tables)
@@ -98,5 +100,38 @@ func testRegetVideoInfo(t *testing.T)  {
 
 	if vi != nil {
 		t.Errorf("Reget should failed")
+	}
+}
+
+func TestComments(t *testing.T)  {
+	clearTables()
+	t.Run("AddUser", testAddUser)
+	t.Run("AddComments", testAddComments)
+	t.Run("Listcomments", testListComments)
+}
+
+func testAddComments(t *testing.T) {
+	vid := "12345"
+	aid := 1
+	content := "I like this"
+
+	err := AddNewComments(vid, aid, content)
+	if err != nil {
+		t.Errorf("Error of testAddComments: %v", err)
+	}
+}
+
+func testListComments(t *testing.T) {
+	vid := "12345"
+	from := 1514764800
+	to, _ := strconv.Atoi(strconv.FormatInt(time.Now().UnixNano()/1000000000, 10))
+
+	res, err := ListComments(vid, from, to)
+	if err != nil {
+		t.Errorf("Error of testListComments: %v", err)
+	}
+
+	for i, ele := range res {
+		fmt.Printf("comment: %d, %v \n", i, ele)
 	}
 }
