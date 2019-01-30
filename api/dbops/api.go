@@ -4,11 +4,10 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"time"
+	"video_server/api/defs"
+	"video_server/api/utils"
 )
-
-// func openConn() *sql.DB {
-// 	dbConn, err := sql.Open("mysql", "root:jkl456@tcp(localhost:3306)/mygo?charset=utf8")
-// }
 
 func AddUserCredential(loginName string, pwd string) error {
 	stmtIns, err := dbConn.Prepare("insert into users (login_name, pwd) values (?, ?)")
@@ -54,6 +53,66 @@ func DeleteUser(loginName string, pwd string) error {
 	return nil
 }
 
-//func AddNewVideo(aid int, name string) {
-//
-//}
+func AddNewVideo(aid int, name string) (*defs.VideoInfo, error) {
+	// create uuid
+	vid, err := utils.NewUUID()
+	if err != nil {
+		return nil, err
+	}
+
+	t := time.Now()
+	cTime := t.Format("Jan 02 2006, 15:04:05") //M D y, HH:MM:SS
+	stmtIns, err := dbConn.Prepare(`INSERT INTO video_info
+		(id, author_id, name, display_ctime) VALUES (?, ?, ?, ?)`)
+	if err != nil {
+		return nil, err
+	}
+	_, err = stmtIns.Exec(vid, aid, name, cTime)
+	if err != nil {
+		return nil, err
+	}
+	defer stmtIns.Close()
+	res := &defs.VideoInfo{Id:vid, AuthorId:aid, Name: name, DisplayCtime: cTime}
+
+	return res, err
+}
+
+func GetVideoInfo(vid string) (*defs.VideoInfo, error) {
+	stmtOut, err := dbConn.Prepare(`select author_id, name, display_ctime from video_info where id = ?`)
+	if err != nil {
+		return nil, err
+	}
+
+	var aid int
+	var dct string
+	var name string
+
+	err = stmtOut.QueryRow(vid).Scan(&aid, &name, &dct)
+	if err != nil && err != sql.ErrNoRows{
+		return nil, err
+	}
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	defer stmtOut.Close()
+
+	res := &defs.VideoInfo{Id: vid, AuthorId: aid, Name: name, DisplayCtime: dct}
+	return res, nil
+}
+
+func DeleteVideoInfo(vid string) error {
+	stmtDel, err := dbConn.Prepare("delete from video_info where id = ?")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmtDel.Exec(vid)
+	if err != nil {
+		return err
+	}
+
+	defer stmtDel.Close()
+	return nil
+}
