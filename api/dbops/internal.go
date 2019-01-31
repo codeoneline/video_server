@@ -15,7 +15,7 @@ func InsertSession(sid string, ttl int64, uname string) error {
 		return nil
 	}
 
-	_, err := stmtIns.Exec(sid, ttlstr, uname)
+	_, err = stmtIns.Exec(sid, ttlstr, uname)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func RetrieveAllSessions() (*sync.Map, error) {
 
 	rows, err := stmtOut.Query()
 	if err != nil {
-		log.Println("%s", err)
+		log.Printf("%s", err)
 		return nil, err
 	}
 

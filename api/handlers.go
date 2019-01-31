@@ -2,16 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"github.com/julienschmidt/httprouter"
 	"video_server/api/dbops"
 	"video_server/api/defs"
 	"video_server/api/session"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	println(p)
 	res, _ := ioutil.ReadAll(r.Body)
 	ubody := &defs.UserCredential{}
 
@@ -37,6 +38,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	println(r)
 	uname := p.ByName("user_name")
 	io.WriteString(w, uname + "\n")
 }

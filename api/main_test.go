@@ -5,6 +5,13 @@ import (
 	"fmt"
 )
 
+func Print1to20() int {
+	a := 0
+	for i:=0; i<21; i++ {
+		a += 10
+	}
+	return a
+}
 func TestPrint(t *testing.T) {
 	res := Print1to20()
 	if res != 210 {
