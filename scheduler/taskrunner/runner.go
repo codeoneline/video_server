@@ -1,5 +1,7 @@
 package taskrunner
 
+import "log"
+
 type Runner struct {
 	Controller controlChan
 	Error controlChan
@@ -38,6 +40,7 @@ func (r *Runner) startDispatch()  {
 				if err != nil {
 					r.Error <- CLOSE
 				} else {
+					log.Printf("*******ready")
 					r.Controller <- READY_TO_EXECUTE
 				}
 			}
@@ -45,8 +48,10 @@ func (r *Runner) startDispatch()  {
 			if c == READY_TO_EXECUTE {
 				err := r.Executor(r.Data)
 				if err != nil {
+					log.Printf("*******finish1")
 					r.Error <- CLOSE
 				} else {
+					log.Printf("*******finish2")
 					r.Controller <- READY_TO_DISPATCH
 				}
 			}

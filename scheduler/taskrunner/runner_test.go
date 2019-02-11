@@ -8,6 +8,7 @@ import (
 )
 
 func TestRunner(t *testing.T) {
+	// dispatcher
 	d := func(dc dataChan) error {
 		for i := 0; i < 30; i++ {
 			dc <- i
@@ -17,6 +18,7 @@ func TestRunner(t *testing.T) {
 		return nil
 	}
 
+	// executor
 	e := func(dc dataChan) error {
 		forloop:
 			for {
